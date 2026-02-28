@@ -29,6 +29,12 @@ main :: proc() {
 		return
 	}
 	defer delete(tokens)
+
+	address_map, address_map_ok := create_address_map(tokens)
+	if !address_map_ok {
+		return
+	}
+	defer destroy_address_map(&address_map)
 }
 
 usage :: proc() {
