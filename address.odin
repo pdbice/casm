@@ -3,8 +3,8 @@ package main
 import "core:fmt"
 
 Address_Map :: struct {
-	line_address:  map[int]u16,
-	label_address: map[string]u16,
+	line_address:  map[int]int,
+	label_address: map[string]int,
 	program_size:  int,
 }
 
@@ -15,11 +15,11 @@ destroy_address_map :: proc(address_map: ^Address_Map) {
 
 create_address_map :: proc(tokens: []Token) -> (Address_Map, bool) {
 	address_map: Address_Map = {
-		make(map[int]u16),
-		make(map[string]u16),
+		make(map[int]int),
+		make(map[string]int),
 		0,
 	}
-	address: u16 = 512
+	address := 512
 
 	for token in tokens {
 		#partial switch token.kind {
@@ -57,7 +57,7 @@ create_address_map :: proc(tokens: []Token) -> (Address_Map, bool) {
 		return address_map, false
 	}
 
-	address_map.program_size = int(address) - 512
+	address_map.program_size = address - 512
 
 	for token_index in 0..<len(tokens) {
 		if tokens[token_index].kind != .Definition {
@@ -77,8 +77,8 @@ create_address_map :: proc(tokens: []Token) -> (Address_Map, bool) {
 	return address_map, true
 }
 
-scan_byte_directive :: proc(tokens: []Token, token_index: ^int) -> (u16, bool) {
-	length: u16
+scan_byte_directive :: proc(tokens: []Token, token_index: ^int) -> (int, bool) {
+	length := 0
 	for token_index^ += 1; token_index^ < len(tokens); token_index^ += 1 {
 		token := tokens[token_index^]
 		#partial switch token.kind {
@@ -95,13 +95,13 @@ scan_byte_directive :: proc(tokens: []Token, token_index: ^int) -> (u16, bool) {
 	return length, true
 }
 
-scan_ascii_directive :: proc(tokens: []Token, token_index: ^int) -> (u16, bool) {
-	length: u16
+scan_ascii_directive :: proc(tokens: []Token, token_index: ^int) -> (int, bool) {
+	length := 0
 	for token_index^ += 1; token_index^ < len(tokens); token_index^ += 1 {
 		token := tokens[token_index^]
 		#partial switch token.kind {
 		case .String:
-			length += u16(len(token.text))
+			length += len(token.text)
 		case .EOL:
 			return length, true
 		case:
