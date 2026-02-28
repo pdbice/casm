@@ -87,7 +87,7 @@ scan_byte_directive :: proc(tokens: []Token, token_index: ^int) -> (u16, bool) {
 		case .EOL:
 			return length, true
 		case:
-			fmt.println("Line %v: Expected unsigned integer, got %v", token.line_number, token.kind)
+			fmt.printfln("Line %v: Expected unsigned integer, got %v", token.line_number, token.kind)
 			token_index^ -= 1
 			return 0, false
 		}
@@ -105,7 +105,7 @@ scan_ascii_directive :: proc(tokens: []Token, token_index: ^int) -> (u16, bool) 
 		case .EOL:
 			return length, true
 		case:
-			fmt.println("Line %v: Expected string, got %v", token.line_number, token.kind)
+			fmt.printfln("Line %v: Expected string, got %v", token.line_number, token.kind)
 			token_index^ -= 1
 			return 0, false
 		}
