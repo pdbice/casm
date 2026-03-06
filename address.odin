@@ -34,7 +34,7 @@ create_address_map :: proc(tokens: []Token) -> (Address_Map, bool) {
 		token := tokens[token_index]
 		#partial switch token.kind {
 		case .BYTE:
-			byte_length, byte_ok := scan_byte_directive(tokens, &token_index)
+			byte_length, byte_ok := parse_byte_directive(tokens, &token_index)
 			if byte_ok {
 				address_map.line_address[token.line_number] = address
 				address += byte_length
@@ -42,7 +42,7 @@ create_address_map :: proc(tokens: []Token) -> (Address_Map, bool) {
 				directive_syntax_ok = false
 			}
 		case .ASCII:
-			ascii_length, ascii_ok := scan_ascii_directive(tokens, &token_index)
+			ascii_length, ascii_ok := parse_ascii_directive(tokens, &token_index)
 			if ascii_ok {
 				address_map.line_address[token.line_number] = address
 				address += ascii_length
@@ -77,7 +77,7 @@ create_address_map :: proc(tokens: []Token) -> (Address_Map, bool) {
 	return address_map, true
 }
 
-scan_byte_directive :: proc(tokens: []Token, token_index: ^int) -> (int, bool) {
+parse_byte_directive :: proc(tokens: []Token, token_index: ^int) -> (int, bool) {
 	length := 0
 	for token_index^ += 1; token_index^ < len(tokens); token_index^ += 1 {
 		token := tokens[token_index^]
@@ -95,7 +95,7 @@ scan_byte_directive :: proc(tokens: []Token, token_index: ^int) -> (int, bool) {
 	return length, true
 }
 
-scan_ascii_directive :: proc(tokens: []Token, token_index: ^int) -> (int, bool) {
+parse_ascii_directive :: proc(tokens: []Token, token_index: ^int) -> (int, bool) {
 	length := 0
 	for token_index^ += 1; token_index^ < len(tokens); token_index^ += 1 {
 		token := tokens[token_index^]
