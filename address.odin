@@ -54,7 +54,7 @@ create_address_map :: proc(tokens: []Token) -> (Address_Map, bool) {
 
 	if !directive_syntax_ok {
 		destroy_address_map(&address_map)
-		return Address_Map {}, false
+		return {}, false
 	}
 
 	address_map.program_size = address - 512
