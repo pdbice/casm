@@ -35,6 +35,25 @@ main :: proc() {
 		return
 	}
 	defer destroy_address_map(&address_map)
+
+	rom, rom_ok := assemble_rom(tokens, address_map)
+	if !rom_ok {
+		return
+	}
+	defer delete(rom)
+
+	outfile: string
+	if len(os.args) > 2 {
+		outfile = os.args[2]
+	} else {
+		outfile = "out.ch8"
+	}
+
+	write_file_ok := os.write_entire_file(outfile, rom)
+	if !write_file_ok {
+		fmt.eprintfln("Could not write to file %v", outfile)
+		return
+	}
 }
 
 usage :: proc() {
