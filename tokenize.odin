@@ -26,6 +26,7 @@ Token_Kind :: enum {
 		DRW,
 		SKP,
 		SKNP,
+		WAIT,
 		LDF,
 		BCD,
 		STR,

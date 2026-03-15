@@ -200,6 +200,15 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			} else {
 				syntax_ok = false
 			}
+		case .WAIT:
+			opcode, opcode_ok = assemble_0xF0(tokens, token_index, 0x0A)
+			if opcode_ok {
+				rom[address - 512] = opcode[0]
+				rom[address - 511] = opcode[1]
+				token_index += 4
+			} else {
+				syntax_ok = false
+			}
 		case .LDF:
 			opcode, opcode_ok = assemble_0xF0(tokens, token_index, 0x29)
 			if opcode_ok {
