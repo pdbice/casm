@@ -187,7 +187,7 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			if opcode_ok {
 				rom[address - 512] = opcode[0]
 				rom[address - 511] = opcode[1]
-				token_index += 4
+				token_index += 2
 			} else {
 				syntax_ok = false
 			}
@@ -196,7 +196,7 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			if opcode_ok {
 				rom[address - 512] = opcode[0]
 				rom[address - 511] = opcode[1]
-				token_index += 4
+				token_index += 2
 			} else {
 				syntax_ok = false
 			}
@@ -205,7 +205,7 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			if opcode_ok {
 				rom[address - 512] = opcode[0]
 				rom[address - 511] = opcode[1]
-				token_index += 4
+				token_index += 2
 			} else {
 				syntax_ok = false
 			}
@@ -214,7 +214,7 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			if opcode_ok {
 				rom[address - 512] = opcode[0]
 				rom[address - 511] = opcode[1]
-				token_index += 4
+				token_index += 2
 			} else {
 				syntax_ok = false
 			}
@@ -223,7 +223,7 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			if opcode_ok {
 				rom[address - 512] = opcode[0]
 				rom[address - 511] = opcode[1]
-				token_index += 4
+				token_index += 2
 			} else {
 				syntax_ok = false
 			}
@@ -232,7 +232,7 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			if opcode_ok {
 				rom[address - 512] = opcode[0]
 				rom[address - 511] = opcode[1]
-				token_index += 4
+				token_index += 2
 			} else {
 				syntax_ok = false
 			}
@@ -241,35 +241,35 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			if opcode_ok {
 				rom[address - 512] = opcode[0]
 				rom[address - 511] = opcode[1]
-				token_index += 4
+				token_index += 2
 			} else {
 				syntax_ok = false
 			}
 		case .ASCII:
 			ascii_address := address - 512
 			ascii_index := token_index + 1
-			for ; ascii_index < len(tokens); ascii_index += 1 {
+			assemble_ascii: for ; ascii_index < len(tokens); ascii_index += 1 {
 				#partial switch tokens[ascii_index].kind {
 				case .String:
 					ascii_value := tokens[ascii_index].text
 					copy(rom[ascii_address:], ascii_value[:])
 					ascii_address += len(ascii_value)
 				case:
-					break
+					break assemble_ascii
 				}
 			}
 			token_index = ascii_index - 1
 		case .BYTE:
 			byte_address := address - 512
 			byte_index := token_index + 1
-			for ; byte_index < len(tokens); byte_index += 1 {
+			assemble_byte: for ; byte_index < len(tokens); byte_index += 1 {
 				#partial switch tokens[byte_index].kind {
 				case .UInt:
 					byte_value, _ := strconv.parse_uint(tokens[byte_index].text)
 					rom[byte_address] = u8(byte_value)
 					byte_address += 1
 				case:
-					break
+					break assemble_byte
 				}
 			}
 			token_index = byte_index - 1
