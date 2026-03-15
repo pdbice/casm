@@ -394,7 +394,7 @@ assemble_skip_equal :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) 
 		return { 0x50 | compare_a, compare_register << 4 }, true
 	}
 
-	fmt.printfln("Line %v: Expected unsigned integer or V0..VF, , found %v", line_number, operands[1])
+	fmt.printfln("Line %v: Expected unsigned integer or V0..VF, found %v", line_number, operands[1])
 	return {}, false
 }
 
@@ -427,7 +427,7 @@ assemble_skip_not_equal :: proc(tokens: []Token, token_index: int) -> ([2]u8, bo
 		return { 0x90 | compare_a, compare_register << 4 }, true
 	}
 
-	fmt.printfln("Line %v: Expected unsigned integer or V0..VF, , found %v", line_number, operands[1])
+	fmt.printfln("Line %v: Expected unsigned integer or V0..VF, found %v", line_number, operands[1])
 	return {}, false
 }
 
