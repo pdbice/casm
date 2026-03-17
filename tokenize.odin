@@ -227,6 +227,7 @@ get_token_kind :: proc(token_text: string) -> Token_Kind {
 	case  "drw",  "DRW": return .DRW
 	case  "skp",  "SKP": return .SKP
 	case "sknp", "SKNP": return .SKNP
+	case "wait", "WAIT": return .WAIT
 	case  "ldf",  "LDF": return .LDF
 	case  "bcd",  "BCD": return .BCD
 	case  "str",  "STR": return .STR
