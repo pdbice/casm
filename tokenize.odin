@@ -6,8 +6,14 @@ import "core:strconv"
 Token_Kind :: enum {
 	Definition,
 	Instruction_Start,
+		SCD,
 		CLS,
 		RET,
+		SCR,
+		SCL,
+		EXIT,
+		LOW,
+		HIGH,
 		JMP,
 		CALL,
 		SE,
@@ -22,15 +28,19 @@ Token_Kind :: enum {
 		SUBN,
 		SHL,
 		LDA,
+		JMPO,
 		RAND,
 		DRW,
 		SKP,
 		SKNP,
 		WAIT,
 		LDF,
+		LDLF,
 		BCD,
 		STR,
 		LDR,
+		SRPL,
+		LRPL,
 	Instruction_End,
 	Directive_Start,
 		BYTE,
@@ -207,8 +217,14 @@ scan_comment :: proc(source: []u8, source_index: ^int) {
 
 get_token_kind :: proc(token_text: string) -> Token_Kind {
 	switch token_text {
+	case  "scd",  "SCD": return .SCD
 	case  "cls",  "CLS": return .CLS
 	case  "ret",  "RET": return .RET
+	case  "scr",  "SCR": return .SCR
+	case  "scl",  "SCL": return .SCL
+	case "exit", "EXIT": return .EXIT
+	case  "low",  "LOW": return .LOW
+	case "high", "HIGH": return .HIGH
 	case  "jmp",  "JMP": return .JMP
 	case "call", "CALL": return .CALL
 	case   "se",   "SE": return .SE
@@ -223,15 +239,19 @@ get_token_kind :: proc(token_text: string) -> Token_Kind {
 	case "subn", "SUBN": return .SUBN
 	case  "shl",  "SHL": return .SHL
 	case  "lda",  "LDA": return .LDA
+	case "jmpo", "JMPO": return .JMPO
 	case "rand", "RAND": return .RAND
 	case  "drw",  "DRW": return .DRW
 	case  "skp",  "SKP": return .SKP
 	case "sknp", "SKNP": return .SKNP
 	case "wait", "WAIT": return .WAIT
 	case  "ldf",  "LDF": return .LDF
+	case "ldlf", "LDLF": return .LDLF
 	case  "bcd",  "BCD": return .BCD
 	case  "str",  "STR": return .STR
 	case  "ldr",  "LDR": return .LDR
+	case "srpl", "SRPL": return .SRPL
+	case "lrpl", "LRPL": return .LRPL
 	case   "v0",   "V0": return .V0
 	case   "v1",   "V1": return .V1
 	case   "v2",   "V2": return .V2
