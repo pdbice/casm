@@ -39,8 +39,8 @@ Token_Kind :: enum {
 		BCD,
 		STR,
 		LDR,
-		SRPL,
-		LRPL,
+		STRF,
+		LDRF,
 	Instruction_End,
 	Directive_Start,
 		BYTE,
@@ -250,8 +250,8 @@ get_token_kind :: proc(token_text: string) -> Token_Kind {
 	case  "bcd",  "BCD": return .BCD
 	case  "str",  "STR": return .STR
 	case  "ldr",  "LDR": return .LDR
-	case "srpl", "SRPL": return .SRPL
-	case "lrpl", "LRPL": return .LRPL
+	case "strf", "STRF": return .STRF
+	case "ldrf", "LDRF": return .LDRF
 	case   "v0",   "V0": return .V0
 	case   "v1",   "V1": return .V1
 	case   "v2",   "V2": return .V2
