@@ -16,6 +16,15 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 		opcode: [2]u8
 		opcode_ok: bool
 		#partial switch token.kind {
+		case .SCD:
+			opcode, opcode_ok = assemble_scroll_down(tokens, token_index)
+			if opcode_ok {
+				rom[address - 512] = opcode[0]
+				rom[address - 511] = opcode[1]
+				token_index += 2
+			} else {
+				syntax_ok = false
+			}
 		case .CLS:
 			opcode_ok = parse_0x00(tokens, token_index)
 			if opcode_ok {
@@ -30,6 +39,51 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			if opcode_ok {
 				rom[address - 512] = 0x00
 				rom[address - 511] = 0xEE
+				token_index += 1
+			} else {
+				syntax_ok = false
+			}
+		case .SCR:
+			opcode_ok = parse_0x00(tokens, token_index)
+			if opcode_ok {
+				rom[address - 512] = 0x00
+				rom[address - 511] = 0xFB
+				token_index += 1
+			} else {
+				syntax_ok = false
+			}
+		case .SCL:
+			opcode_ok = parse_0x00(tokens, token_index)
+			if opcode_ok {
+				rom[address - 512] = 0x00
+				rom[address - 511] = 0xFC
+				token_index += 1
+			} else {
+				syntax_ok = false
+			}
+		case .EXIT:
+			opcode_ok = parse_0x00(tokens, token_index)
+			if opcode_ok {
+				rom[address - 512] = 0x00
+				rom[address - 511] = 0xFD
+				token_index += 1
+			} else {
+				syntax_ok = false
+			}
+		case .LOW:
+			opcode_ok = parse_0x00(tokens, token_index)
+			if opcode_ok {
+				rom[address - 512] = 0x00
+				rom[address - 511] = 0xFE
+				token_index += 1
+			} else {
+				syntax_ok = false
+			}
+		case .HIGH:
+			opcode_ok = parse_0x00(tokens, token_index)
+			if opcode_ok {
+				rom[address - 512] = 0x00
+				rom[address - 511] = 0xFF
 				token_index += 1
 			} else {
 				syntax_ok = false
@@ -164,6 +218,7 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			} else {
 				syntax_ok = false
 			}
+		case .JMPO:
 		case .RAND:
 			opcode, opcode_ok = assemble_rand(tokens, token_index)
 			if opcode_ok {
@@ -218,6 +273,15 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			} else {
 				syntax_ok = false
 			}
+		case .LDLF:
+			opcode, opcode_ok = assemble_0xF0(tokens, token_index, 0x30)
+			if opcode_ok {
+				rom[address - 512] = opcode[0]
+				rom[address - 511] = opcode[1]
+				token_index += 2
+			} else {
+				syntax_ok = false
+			}
 		case .BCD:
 			opcode, opcode_ok = assemble_0xF0(tokens, token_index, 0x33)
 			if opcode_ok {
@@ -245,6 +309,8 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 			} else {
 				syntax_ok = false
 			}
+		case .STRF:
+		case .LDRF:
 		case .ASCII:
 			ascii_address := address - 512
 			ascii_index := token_index + 1
@@ -281,6 +347,29 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 		return nil, false
 	}
 	return rom, true
+}
+
+assemble_scroll_down :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
+	operands: [2]Token_Kind = {
+		peek_token_kind(tokens, token_index + 1),
+		peek_token_kind(tokens, token_index + 2),
+	}
+
+	line_number := tokens[token_index].line_number
+
+	if operands[0] != .UInt {
+		fmt.printfln("Line %v: Expected unsigned integer, found %v", line_number, operands[0])
+		return {}, false
+	}
+
+	if operands[1] != .EOL {
+		fmt.printfln("Line %v: Expected EOL, found %v", line_number, operands[1])
+		return {}, false
+	}
+
+	scroll_lines, _ := strconv.parse_uint(tokens[token_index + 1].text)
+
+	return { 0x00, 0xC0 | u8(scroll_lines) }, true
 }
 
 parse_0x00 :: proc(tokens: []Token, token_index: int) -> bool {
