@@ -64,6 +64,7 @@ usage :: proc() {
 	fmt.println()
 	fmt.println()
 }
+
 check_tracking_allocator :: proc(tracking_allocator: ^mem.Tracking_Allocator) {
 	if len(tracking_allocator.allocation_map) > 0 {
 		fmt.eprintfln("%v allocations not freed:", len(tracking_allocator.allocation_map))
