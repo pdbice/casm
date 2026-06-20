@@ -314,7 +314,23 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 				syntax_ok = false
 			}
 		case .STRF:
+			opcode, opcode_ok = assemble_RPL(tokens, token_index, 0x75)
+			if opcode_ok {
+				rom[address - 512] = opcode[0]
+				rom[address - 511] = opcode[1]
+				token_index += 2
+			} else {
+				syntax_ok = false
+			}
 		case .LDRF:
+			opcode, opcode_ok = assemble_RPL(tokens, token_index, 0x85)
+			if opcode_ok {
+				rom[address - 512] = opcode[0]
+				rom[address - 511] = opcode[1]
+				token_index += 2
+			} else {
+				syntax_ok = false
+			}
 		case .ASCII:
 			ascii_address := address - 512
 			ascii_index := token_index + 1
@@ -710,6 +726,34 @@ assemble_0xF0 :: proc(tokens: []Token, token_index: int, opcode_low: u8) -> ([2]
 		fmt.printfln("Line %v: Expected V0..VF, found %v", line_number, operands[0])
 		return {}, false
 	}
+
+	if operands[1] != .EOL {
+		fmt.printfln("Line %v: Expected EOL, found %v", line_number, operands[0])
+		return {}, false
+	}
+
+	return { 0xF0 | v_register, opcode_low }, true
+}
+
+assemble_RPL :: proc(tokens: []Token, token_index: int, opcode_low: u8) -> ([2]u8, bool) {
+	operands: [2]Token_Kind = {
+		peek_token_kind(tokens, token_index + 1),
+		peek_token_kind(tokens, token_index + 2),
+	}
+
+	line_number := tokens[token_index].line_number
+
+	v_register, v_register_ok := get_v_register_index(operands[0])
+	if !v_register_ok {
+		fmt.printfln("Line %v: Expected V0..VF, found %v", line_number, operands[0])
+		return {}, false
+	}
+	
+	if v_register > 7 {
+		fmt.printfln("Line %v: Value %v out of range 0..7", line_number, v_register)
+		return {}, false
+	}
+
 
 	if operands[1] != .EOL {
 		fmt.printfln("Line %v: Expected EOL, found %v", line_number, operands[0])
