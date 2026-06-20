@@ -89,20 +89,16 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 				syntax_ok = false
 			}
 		case .JMP:
-			opcode, opcode_ok = assemble_jump(tokens, token_index, address_map.label_address)
+			opcode, opcode_ok = assemble_address_label(tokens, token_index, address_map.label_address, 0x10)
 			if opcode_ok {
 				rom[address - 512] = opcode[0]
 				rom[address - 511] = opcode[1]
-				if opcode[0] & 0xF0 == 0xB0 {
-					token_index += 3
-				} else {
-					token_index += 2
-				}
+				token_index += 2
 			} else {
 				syntax_ok = false
 			}
 		case .CALL:
-			opcode, opcode_ok = assemble_call(tokens, token_index, address_map.label_address)
+			opcode, opcode_ok = assemble_address_label(tokens, token_index, address_map.label_address, 0x20)
 			if opcode_ok {
 				rom[address - 512] = opcode[0]
 				rom[address - 511] = opcode[1]
@@ -210,7 +206,7 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 				syntax_ok = false
 			}
 		case .LDA:
-			opcode, opcode_ok = assemble_load_address(tokens, token_index, address_map.label_address)
+			opcode, opcode_ok = assemble_address_label(tokens, token_index, address_map.label_address, 0xA0)
 			if opcode_ok {
 				rom[address - 512] = opcode[0]
 				rom[address - 511] = opcode[1]
@@ -219,6 +215,14 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 				syntax_ok = false
 			}
 		case .JMPO:
+			opcode, opcode_ok = assemble_address_label(tokens, token_index, address_map.label_address, 0xB0)
+			if opcode_ok {
+				rom[address - 512] = opcode[0]
+				rom[address - 511] = opcode[1]
+				token_index += 2
+			} else {
+				syntax_ok = false
+			}
 		case .RAND:
 			opcode, opcode_ok = assemble_rand(tokens, token_index)
 			if opcode_ok {
@@ -382,51 +386,7 @@ parse_0x00 :: proc(tokens: []Token, token_index: int) -> bool {
 	return true
 }
 
-assemble_jump :: proc(tokens: []Token, token_index: int, label_address_map: map[string]int) -> ([2]u8, bool) {
-	operands: [3]Token_Kind
-	operands[0] = peek_token_kind(tokens, token_index + 1)
-	operands[1] = peek_token_kind(tokens, token_index + 2)
-	
-	line_number := tokens[token_index].line_number
-
-	jump_op: u8
-	jump_label: string
-
-	#partial switch operands[0] {
-	case .Label:
-		if operands[1] != .EOL {
-			fmt.printfln("Line %v: Expected EOL, found %v", line_number, operands[1])
-			return {}, false
-		}
-		jump_op = 0x10
-		jump_label = tokens[token_index + 1].text
-	case .V0:
-		operands[2] = peek_token_kind(tokens, token_index + 3)
-		if operands[1] != .Label {
-			fmt.printfln("Line %v: Expected label, found %v", line_number, operands[1])
-			return {}, false
-		}
-		if operands[2] != .EOL {
-			fmt.printfln("Line %v: Expected EOL, found %v", line_number, operands[2])
-			return {}, false
-		}
-		jump_op = 0xB0
-		jump_label = tokens[token_index + 2].text
-	case:
-		fmt.printfln("Line %v: Expected label or V0, found %v", line_number, operands[0])
-		return {}, false
-	}
-
-	label_address, label_address_ok := label_address_map[jump_label]
-	if !label_address_ok {
-		fmt.printfln("Line %v: Label %v is not defined", line_number, jump_label)
-		return {}, false
-	}
-
-	return { jump_op | u8(label_address & 0xF00 >> 8), u8(label_address & 0xFF) }, true
-}
-
-assemble_call :: proc(tokens: []Token, token_index: int, label_address_map: map[string]int) -> ([2]u8, bool) {
+assemble_address_label :: proc(tokens: []Token, token_index: int, label_address_map: map[string]int, opcode_high: u8) -> ([2]u8, bool) {
 	operands: [2]Token_Kind = {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
@@ -444,14 +404,14 @@ assemble_call :: proc(tokens: []Token, token_index: int, label_address_map: map[
 		return {}, false
 	}
 
-	call_label := tokens[token_index + 1].text
-	label_address, label_address_ok := label_address_map[call_label]
+	label := tokens[token_index + 1].text
+	label_address, label_address_ok := label_address_map[label]
 	if !label_address_ok {
-		fmt.printfln("Line %v: Label %v is not defined", line_number, call_label)
+		fmt.printfln("Line %v: Label %v is not defined", line_number, label)
 		return {}, false
 	}
 
-	return { 0x20 | u8(label_address & 0xF00 >> 8), u8(label_address & 0xFF) }, true
+	return { (opcode_high & 0xF0) | u8(label_address & 0xF00 >> 8), u8(label_address & 0xFF) }, true
 }
 
 assemble_skip_equal :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
@@ -642,34 +602,6 @@ assemble_0x80 :: proc(tokens: []Token, token_index: int, math_op: u8) -> ([2]u8,
 	}
 
 	return { 0x80 | destination, term << 4 | math_op }, true
-}
-
-assemble_load_address :: proc(tokens: []Token, token_index: int, label_address_map: map[string]int) -> ([2]u8, bool) {
-	operands: [2]Token_Kind = {
-		peek_token_kind(tokens, token_index + 1),
-		peek_token_kind(tokens, token_index + 2),
-	}
-
-	line_number := tokens[token_index].line_number
-
-	if operands[0] != .Label {
-		fmt.printfln("Line %v: Expected label, found %v", line_number, operands[0])
-		return {}, false
-	}
-
-	if operands[1] != .EOL {
-		fmt.printfln("Line %v: Expected EOL, found %v", line_number, operands[1])
-		return {}, false
-	}
-
-	load_label := tokens[token_index + 1].text
-	label_address, label_address_ok := label_address_map[load_label]
-	if !label_address_ok {
-		fmt.printfln("Line %v: Label %v is not defined", line_number, load_label)
-		return {}, false
-	}
-
-	return { 0xA0 | u8(label_address & 0xF00 >> 8), u8(label_address & 0xFF) }, true
 }
 
 assemble_rand :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
