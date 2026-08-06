@@ -370,7 +370,7 @@ assemble_rom :: proc(tokens: []Token, address_map: Address_Map) -> ([]u8, bool) 
 }
 
 assemble_scroll_down :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
-	operands: [2]Token_Kind = {
+	operands := [2]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 	}
@@ -403,7 +403,7 @@ parse_0x00 :: proc(tokens: []Token, token_index: int) -> bool {
 }
 
 assemble_address_label :: proc(tokens: []Token, token_index: int, label_address_map: map[string]int, opcode_high: u8) -> ([2]u8, bool) {
-	operands: [2]Token_Kind = {
+	operands := [2]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 	}
@@ -431,7 +431,7 @@ assemble_address_label :: proc(tokens: []Token, token_index: int, label_address_
 }
 
 assemble_skip_equal :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
-	operands: [3]Token_Kind = {
+	operands := [3]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 		peek_token_kind(tokens, token_index + 3),
@@ -464,7 +464,7 @@ assemble_skip_equal :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) 
 }
 
 assemble_skip_not_equal :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
-	operands: [3]Token_Kind = {
+	operands := [3]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 		peek_token_kind(tokens, token_index + 3),
@@ -497,7 +497,7 @@ assemble_skip_not_equal :: proc(tokens: []Token, token_index: int) -> ([2]u8, bo
 }
 
 assemble_move :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
-	operands: [3]Token_Kind = {
+	operands := [3]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 		peek_token_kind(tokens, token_index + 3),
@@ -549,7 +549,7 @@ assemble_move :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
 }
 
 assemble_add :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
-	operands: [3]Token_Kind = {
+	operands := [3]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 		peek_token_kind(tokens, token_index + 3),
@@ -592,7 +592,7 @@ assemble_add :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
 }
 
 assemble_0x80 :: proc(tokens: []Token, token_index: int, math_op: u8) -> ([2]u8, bool) {
-	operands: [3]Token_Kind = {
+	operands := [3]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 		peek_token_kind(tokens, token_index + 3),
@@ -621,7 +621,7 @@ assemble_0x80 :: proc(tokens: []Token, token_index: int, math_op: u8) -> ([2]u8,
 }
 
 assemble_rand :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
-	operands: [3]Token_Kind = {
+	operands := [3]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 		peek_token_kind(tokens, token_index + 3),
@@ -651,7 +651,7 @@ assemble_rand :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
 }
 
 assemble_draw :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
-	operands: [4]Token_Kind = {
+	operands := [4]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 		peek_token_kind(tokens, token_index + 3),
@@ -692,7 +692,7 @@ assemble_draw :: proc(tokens: []Token, token_index: int) -> ([2]u8, bool) {
 }
 
 assemble_0xE0 :: proc(tokens: []Token, token_index: int, opcode_low: u8) -> ([2]u8, bool) {
-	operands: [2]Token_Kind = {
+	operands := [2]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 	}
@@ -714,7 +714,7 @@ assemble_0xE0 :: proc(tokens: []Token, token_index: int, opcode_low: u8) -> ([2]
 }
 
 assemble_0xF0 :: proc(tokens: []Token, token_index: int, opcode_low: u8) -> ([2]u8, bool) {
-	operands: [2]Token_Kind = {
+	operands := [2]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 	}
@@ -736,7 +736,7 @@ assemble_0xF0 :: proc(tokens: []Token, token_index: int, opcode_low: u8) -> ([2]
 }
 
 assemble_RPL :: proc(tokens: []Token, token_index: int, opcode_low: u8) -> ([2]u8, bool) {
-	operands: [2]Token_Kind = {
+	operands := [2]Token_Kind {
 		peek_token_kind(tokens, token_index + 1),
 		peek_token_kind(tokens, token_index + 2),
 	}

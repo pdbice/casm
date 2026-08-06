@@ -14,7 +14,7 @@ destroy_address_map :: proc(address_map: ^Address_Map) {
 }
 
 create_address_map :: proc(tokens: []Token) -> (Address_Map, bool) {
-	address_map: Address_Map = {
+	address_map := Address_Map {
 		make(map[int]int),
 		make(map[string]int),
 		0,
